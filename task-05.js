@@ -3,7 +3,7 @@ const form = document.querySelector(".form");
 console.dir(form);
 
 form.addEventListener("input", (e) => {
-  console.log(e.target.name);
+  console.dir(e.target.name);
   if (e.target.name === "firstInput") {
     localStorage.setItem("firstInput-data", e.target.value);
   } else if (e.target.name === "secondInput") {
@@ -16,6 +16,9 @@ form.addEventListener("input", (e) => {
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   const { firstInput, secondInput } = e.target.elements;
+  console.log(e.target.elements);
+  console.dir(firstInput.value);
+
   const obj = {
     firstInput: firstInput.value,
     secondInput: secondInput.value,

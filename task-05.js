@@ -1,34 +1,64 @@
-console.log(localStorage);
-const form = document.querySelector(".form");
-console.dir(form);
+const inputEl = document.querySelector(".input");
+const btn = document.querySelector(".btn");
+const wrapper = document.querySelector(".wrapper");
+let users;
 
-form.addEventListener("input", (e) => {
-  console.dir(e.target.name);
-  if (e.target.name === "firstInput") {
-    localStorage.setItem("firstInput-data", e.target.value);
-  } else if (e.target.name === "secondInput") {
-    localStorage.setItem("secondInput-data", e.target.value);
-  } else {
-    alert(`Что-то пошло не так!`);
+window.addEventListener("DOMContentLoaded", onLoad);
+btn.addEventListener("click", onClick);
+
+function fetchUsers() {
+  return fetch("https://jsonplaceholder.typicode.com/users").then(
+    (responce) => {
+      return responce.json();
+    }
+  );
+}
+
+function onLoad() {
+  fetchUsers().then((data) => {
+    users = data;
+    console.log(users);
+    const markup = createMarkup(data);
+    wrapper.insertAdjacentHTML("beforeend", markup);
+  });
+}
+
+function createMarkup(arr) {
+  return arr
+    .map((e) => {
+      return `<div>
+  <p>${e.name}</p>
+  <p>${e.email}</p>
+</div>`;
+    })
+    .join("");
+}
+
+function createElMarkup(arr) {
+  return arr
+    .map((e) => {
+      return `<div>
+  <p>${e.name}</p>
+  <p>${e.email}</p>
+    <p>${e.address.city}</p>
+      <p>${e.phone}</p>
+        <p>${e.username}</p>
+        <p>${e.website}</p>
+</div>`;
+    })
+    .join("");
+}
+
+function onClick() {
+  const valueInput = inputEl.value.toLowerCase();
+  const newArr = users.filter((e) => e.name.toLowerCase().includes(valueInput));
+  if (newArr.length === 0) {
+    return (wrapper.innerHTML = `<p>No information</p>`);
   }
-});
-
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const { firstInput, secondInput } = e.target.elements;
-  console.log(e.target.elements);
-  console.dir(firstInput.value);
-
-  const obj = {
-    firstInput: firstInput.value,
-    secondInput: secondInput.value,
-  };
-  localStorage.setItem("obj", JSON.stringify(obj)); // тут отправляемна бек
-  localStorage.removeItem("firstInput-data");
-  localStorage.removeItem("secondInput-data");
-  firstInput.value = "";
-  secondInput.value = "";
-});
-
-form.elements.firstInput.value = localStorage.getItem("firstInput-data");
-form.elements.secondInput.value = localStorage.getItem("secondInput-data");
+  if (newArr.length === 1) {
+    wrapper.innerHTML = "";
+    return wrapper.insertAdjacentHTML("beforeend", createElMarkup(newArr));
+  }
+  wrapper.innerHTML = "";
+  wrapper.insertAdjacentHTML("beforeend", createMarkup(newArr));
+}
